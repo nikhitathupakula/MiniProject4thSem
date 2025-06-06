@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CyberCrime Investigation - Officer Login</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="bg-gray-900 text-white min-h-screen font-sans">
+  <div class="login-container">
+    <h2>🔐 Officer Login</h2>
+
+    {% if error %}
+    <p style="color: red; margin-bottom: 1em;">{{ error }}</p>
+    {% endif %}
+
+    <form method="POST" action="/login">
+      <input type="email" name="email" placeholder="Email">
+      <input type="password" name="password" placeholder="Password" required>
+      <button type="submit">Login</button>
+    </form>
+
+    <p class="footer">© 2025 CyberCrime DBMS</p>
+  </div>
+</body>
+
+</html>

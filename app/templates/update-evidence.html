@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Evidence</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+</head>
+
+<body class="bg-gray-900 text-white min-h-screen">
+
+  <header class="bg-blue-900 p-4 flex justify-between items-center shadow-md">
+    <h1 class="text-xl font-bold flex items-center gap-2">
+      <span class="material-symbols-outlined">edit</span> Edit Evidence
+    </h1>
+    <a href="{{ url_for('evidence.manage_evidence') }}" class="text-white hover:text-blue-300">
+      <span class="material-symbols-outlined">arrow_back</span> Back
+    </a>
+  </header>
+
+  <main class="p-6 max-w-4xl mx-auto">
+    <form method="POST" class="bg-gray-800 p-6 rounded-lg shadow-md space-y-4 border border-gray-700">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input type="text" value="{{ evidence.evidence_type }}" name="evidence_type" placeholder="Evidence Type"
+          class="bg-gray-700 p-3 rounded border border-gray-600" />
+        <input type="text" value="{{ evidence.storage_location or '' }}" name="storage_location"
+          placeholder="Storage Location" class="bg-gray-700 p-3 rounded border border-gray-600" />
+        <input type="text" value="{{ evidence.file_url or '' }}" name="file_url" placeholder="File URL"
+          class="bg-gray-700 p-3 rounded border border-gray-600" />
+      </div>
+      <select name="status" class="w-full bg-gray-700 p-3 rounded border border-gray-600">
+        <option value="Collected" {% if evidence.status=='Collected' %}selected{% endif %}>Collected</option>
+        <option value="Analyzed" {% if evidence.status=='Analyzed' %}selected{% endif %}>Analyzed</option>
+        <option value="Archived" {% if evidence.status=='Archived' %}selected{% endif %}>Archived</option>
+      </select>
+      <textarea name="description" placeholder="Description"
+        class="w-full bg-gray-700 p-3 rounded border border-gray-600">{{ evidence.description }}</textarea>
+      <div class="flex gap-4 mt-6">
+        <button type="submit" class="bg-yellow-500 hover:bg-yellow-400 px-5 py-2 rounded text-black font-semibold">
+          <span class="material-symbols-outlined">save</span> Save Changes
+        </button>
+        <a href="{{ url_for('evidence.manage_evidence') }}"
+          class="bg-red-600 hover:bg-red-500 px-5 py-2 rounded text-white">
+          <span class="material-symbols-outlined">cancel</span> Cancel
+        </a>
+      </div>
+    </form>
+  </main>
+</body>
+
+</html>

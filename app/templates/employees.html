@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Employee Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+</head>
+
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-indigo-950 to-indigo-900 p-4 shadow-xl border-b border-indigo-800">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <h1 class="text-2xl font-bold flex items-center gap-2">
+        <span class="material-symbols-outlined">badge</span>
+        Employee Management
+      </h1>
+      <a href="{{ url_for('dashboard.dashboard_home') }}"
+        class="text-white hover:text-indigo-300 flex items-center gap-1">
+        <span class="material-symbols-outlined">arrow_back</span> Dashboard
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Section -->
+  <main class="max-w-7xl mx-auto p-6">
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="mb-4 space-y-2">
+      {% for message in messages %}
+      <div class="bg-green-600 text-white px-4 py-2 rounded shadow">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Add Employee Button -->
+    <div class="flex justify-end mb-6">
+      <button onclick="document.getElementById('modal').classList.remove('hidden')"
+        class="bg-teal-600 hover:bg-teal-500 px-5 py-2 rounded-full flex items-center gap-2">
+        <span class="material-symbols-outlined">person_add</span>
+        Add Employee
+      </button>
+    </div>
+
+    <!-- Employee Table -->
+    <div class="overflow-x-auto bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
+      <table class="min-w-full text-sm">
+        <thead class="bg-gray-700">
+          <tr>
+            <th class="px-4 py-2 text-left">Name</th>
+            <th class="px-4 py-2 text-left">Email</th>
+            <th class="px-4 py-2 text-left">Role</th>
+            <th class="px-4 py-2 text-left">Phone</th>
+            <th class="px-4 py-2 text-left">Joined At</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for emp in employees %}
+          <tr class="border-t border-gray-700 hover:bg-gray-700/30 transition">
+            <td class="px-4 py-2">{{ emp.off_name }}</td>
+            <td class="px-4 py-2">{{ emp.email }}</td>
+            <td class="px-4 py-2">{{ emp.role_name }}</td>
+            <td class="px-4 py-2">{{ emp.phone }}</td>
+            <td class="px-6 py-3">
+              {% if emp.joined_at %}
+              {{ emp.joined_at.strftime('%Y-%m-%d') if emp.joined_at.__class__.__name__ == 'datetime' else
+              emp.joined_at[:10] }}
+              {% else %}
+              N/A
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Add Employee Modal -->
+  <div id="modal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50">
+    <div class="bg-gray-900 border border-gray-700 w-full max-w-lg p-6 rounded-lg shadow-xl">
+      <h2 class="text-xl font-bold mb-4 text-teal-400 text-center">Add New Employee</h2>
+      <form method="POST" class="space-y-4">
+        <!-- CSRF token if needed (Flask-WTF) -->
+        <input name="name" placeholder="Name" required
+          class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white" />
+        <input name="email" type="email" placeholder="Email" required
+          class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white" />
+        <input name="role" placeholder="Role (e.g. Officer)" required
+          class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white" />
+        <input name="phone" placeholder="Phone" required
+          class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white" />
+        <input name="joined_at" type="date" required
+          class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white" />
+        <input name="password" type="password" placeholder="Password" required
+          class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white" />
+
+        <div class="flex justify-end gap-3 pt-4">
+          <button type="button" onclick="document.getElementById('modal').classList.add('hidden')"
+            class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded">Cancel</button>
+          <button type="submit" class="bg-teal-600 hover:bg-teal-500 px-4 py-2 rounded">Add</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</body>
+
+</html>

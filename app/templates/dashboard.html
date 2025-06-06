@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phishing Investigation Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+</head>
+
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white min-h-screen font-sans">
+
+  <!-- Header -->
+  <header
+    class="bg-gradient-to-r from-blue-950 to-blue-900 p-4 flex justify-between items-center shadow-xl border-b border-purple-800">
+    <h1 class="text-2xl font-bold">Officer Dashboard</h1>
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined">account_circle</span>
+      <span id="officerName" class="mr-4 font-medium text-white">
+        Welcome, {{ current_user.off_name }}
+      </span>
+      <a href="{{ url_for('auth.logout') }}" class="text-red-400 hover:text-red-950"><span
+          class="material-symbols-outlined">logout</span>Logout</a>
+    </div>
+  </header>
+
+  <!-- Main Section -->
+  <main class="p-6">
+    <div class="max-w-7xl mx-auto">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-white mb-1">Investigation Hub</h2>
+        <p class="text-gray-400 text-sm">Access all investigation tools and case management features</p>
+
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Reusable Card -->
+        {% set cards = [
+        {'url': 'cases.list_cases', 'icon': 'folder', 'title': 'Case Management', 'desc': 'Manage, add, and view
+        investigation cases with comprehensive tracking and documentation.', 'from': 'blue', 'to': 'blue'},
+        {'url': 'evidence.manage_evidence', 'icon': 'description', 'title': 'Evidence Management', 'desc': 'Upload,
+        organize, and manage digital evidence with secure storage and chain of custody tracking.', 'from': 'emerald',
+        'to': 'emerald'},
+        {'url': 'laws.laws', 'icon': 'gavel', 'title': 'Laws & Regulations', 'desc': 'Reference comprehensive cybercrime
+        laws, regulations, and legal precedents for investigations.', 'from': 'amber', 'to': 'amber'},
+        {'url': 'statistics.show_stats', 'icon': 'analytics', 'title': 'Statistics & Analytics', 'desc': 'View
+        comprehensive system usage, case statistics, and performance analytics dashboard.', 'from': 'cyan', 'to':
+        'cyan'}
+        ] %}
+
+        {% for card in cards %}
+        <a href="{{ url_for(card.url) }}"
+          class="group bg-gray-800 hover:bg-gradient-to-br hover:from-gray-800 hover:to-{{ card.to }}-900 p-5 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 border border-gray-700 hover:border-{{ card.to }}-600 cursor-pointer block">
+          <div class="flex items-center mb-3">
+            <div
+              class="w-10 h-10 bg-gradient-to-r from-{{ card.from }}-500 to-{{ card.to }}-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+              <span class="material-symbols-outlined text-white text-lg">{{ card.icon }}</span>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-200 ml-3">{{ card.title }}</h3>
+          </div>
+          <p class="text-gray-400 text-sm leading-relaxed">{{ card.desc }}</p>
+          <div
+            class="mt-4 flex items-center text-{{ card.to }}-400 font-medium group-hover:text-{{ card.to }}-300 text-sm">
+            <span>View</span>
+            <span
+              class="material-symbols-outlined ml-2 group-hover:translate-x-1 transition-transform text-sm">arrow_forward</span>
+          </div>
+        </a>
+        {% endfor %}
+
+        {% if role == 'Admin' %}
+        <a href="{{ url_for('employee.manage_employees') }}"
+          class="group bg-gray-800 hover:bg-gradient-to-br hover:from-gray-800 hover:to-purple-900 p-5 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 border border-gray-700 hover:border-purple-700 cursor-pointer block">
+          <div class="flex items-center mb-3">
+            <div
+              class="w-10 h-10 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+              <span class="material-symbols-outlined text-white text-lg">badge</span>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-200 ml-3">Employee Management</h3>
+          </div>
+          <p class="text-gray-400 text-sm leading-relaxed">Manage officer records, assignments, and departmental
+            personnel with role-based access control.</p>
+          <div class="mt-4 flex items-center text-purple-400 font-medium group-hover:text-purple-300 text-sm">
+            <span>Manage Staff</span>
+            <span
+              class="material-symbols-outlined ml-2 group-hover:translate-x-1 transition-transform text-sm">arrow_forward</span>
+          </div>
+        </a>
+        {% endif %}
+
+        <a href="{{ url_for('suspects.manage_victims_suspects') }}"
+          class="group bg-gray-800 hover:bg-gradient-to-br hover:from-gray-800 hover:to-red-900 p-5 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 border border-gray-700 hover:border-red-700 cursor-pointer block">
+          <div class="flex items-center mb-3">
+            <div
+              class="w-10 h-10 bg-gradient-to-r from-red-500 to-red-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+              <span class="material-symbols-outlined text-white text-lg">groups</span>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-200 ml-3">Suspects & Victims</h3>
+          </div>
+          <p class="text-gray-400 text-sm leading-relaxed">Add, view, and manage victim and suspect profiles with
+            detailed background information.</p>
+          <div class="mt-4 flex items-center text-red-400 font-medium group-hover:text-red-300 text-sm">
+            <span>Manage Profiles</span>
+            <span
+              class="material-symbols-outlined ml-2 group-hover:translate-x-1 transition-transform text-sm">arrow_forward</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </main>
+</body>
+
+</html>

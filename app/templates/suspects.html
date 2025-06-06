@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Victims & Suspects</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+</head>
+
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white min-h-screen font-sans">
+  <header
+    class="bg-gradient-to-r from-blue-950 to-blue-900 p-4 flex justify-between items-center shadow-xl border-b border-blue-800">
+    <h1 class="text-2xl font-bold flex items-center gap-2">
+      <span class="material-symbols-outlined">groups</span>
+      Victim & Suspect Management
+    </h1>
+    <a href="{{ url_for('dashboard.dashboard_home') }}"
+      class="text-white hover:text-blue-200 transition flex items-center gap-1">
+      <span class="material-symbols-outlined">arrow_back</span>
+      Dashboard
+    </a>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 py-8">
+    <!-- Navigation Buttons -->
+    <div class="flex justify-center gap-6 mb-8">
+      <button onclick="navigateTo('victim')"
+        class="bg-teal-600 hover:bg-teal-500 px-6 py-3 rounded-full font-medium flex items-center gap-2">
+        <span class="material-symbols-outlined">person</span>
+        Victim
+      </button>
+      <button onclick="navigateTo('suspect')"
+        class="bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded-full font-medium flex items-center gap-2">
+        <span class="material-symbols-outlined">gavel</span>
+        Suspect
+      </button>
+    </div>
+
+    <!-- Victim Page -->
+    <section id="victimPage" class="hidden">
+      <h2 class="text-xl font-semibold text-center mb-4">Victim Details</h2>
+      <div class="overflow-x-auto bg-gray-800 p-6 rounded-xl shadow-md border border-gray-700">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-700 text-left">
+            <tr>
+              <th class="p-3">Name</th>
+              <th class="p-3">Contact</th>
+              <th class="p-3">Address</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for victim in victims %}
+            <tr class="border-b border-gray-700 hover:bg-gray-700/30 transition">
+              <td class="p-3">{{ victim['vic_name'] }}</td>
+              <td class="p-3">{{ victim['vic_contact'] }}</td>
+              <td class="p-3">{{ victim['vic_address'] }}</td>
+            </tr>
+            {% else %}
+            <tr class="border-b border-gray-700 text-center">
+              <td colspan="3" class="p-4">No Victims Found</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Suspect Page -->
+    <section id="suspectPage" class="hidden">
+      <h2 class="text-xl font-semibold text-center mb-4">Suspect Details</h2>
+      <div class="overflow-x-auto bg-gray-800 p-6 rounded-xl shadow-md border border-gray-700 mb-6">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-700 text-left">
+            <tr>
+              <th class="p-3">Name</th>
+              <th class="p-3">Contact</th>
+              <th class="p-3">Address</th>
+              <th class="p-3">Email</th>
+              <th class="p-3">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for suspect in suspects %}
+            <tr class="border-b border-gray-700 hover:bg-gray-700/30 transition">
+              <td class="p-3">{{ suspect['sus_name'] }}</td>
+              <td class="p-3">{{ suspect['sus_contact'] }}</td>
+              <td class="p-3">{{ suspect['sus_address'] }}</td>
+              <td class="p-3">{{ suspect['sus_email'] }}</td>
+              <td class="p-3">{{ suspect['sus_status'] }}</td>
+            </tr>
+            {% else %}
+            <tr class="border-b border-gray-700 text-center">
+              <td colspan="5" class="p-4">No Suspects Found</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Add Suspect Button -->
+      <button onclick="toggleSuspectForm()"
+        class="w-full px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-lg font-semibold">
+        <span class="material-symbols-outlined align-middle mr-1">person_add</span>
+        Add Suspect
+      </button>
+
+      <!-- Add Suspect Form -->
+      <div id="suspectForm" class="hidden mt-6 bg-gray-800 p-6 rounded-xl shadow-md border border-gray-700">
+        <h3 class="text-lg font-semibold mb-4 text-center">Add New Suspect</h3>
+        <form onsubmit="addSuspect(event)" class="max-w-md mx-auto space-y-3">
+          <input required type="text" id="suspectName" placeholder="Name"
+            class="w-full p-2 rounded bg-gray-700 text-white" />
+          <input required type="text" id="suspectContact" placeholder="Contact"
+            class="w-full p-2 rounded bg-gray-700 text-white" />
+          <input required type="text" id="suspectAddress" placeholder="Address"
+            class="w-full p-2 rounded bg-gray-700 text-white" />
+          <input required type="email" id="suspectEmail" placeholder="Email"
+            class="w-full p-2 rounded bg-gray-700 text-white" />
+          <select id="suspectStatus" required class="w-full p-2 rounded bg-gray-700 text-white">
+            <option value="Under Investigation">Under Investigation</option>
+            <option value="Cleared">Cleared</option>
+            <option value="Charged">Charged</option>
+            <option value="Arrested">Arrested</option>
+          </select>
+          <button type="submit"
+            class="w-full px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded font-semibold">Submit</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    function navigateTo(page) {
+      document.getElementById('victimPage').classList.add('hidden');
+      document.getElementById('suspectPage').classList.add('hidden');
+      if (page === 'victim') {
+        document.getElementById('victimPage').classList.remove('hidden');
+      } else {
+        document.getElementById('suspectPage').classList.remove('hidden');
+      }
+    }
+
+    function toggleSuspectForm() {
+      document.getElementById('suspectForm').classList.toggle('hidden');
+    }
+
+    function addSuspect(e) {
+      e.preventDefault();
+      alert("This form submission should be handled server-side or with JS fetch.");
+    }
+
+    // Optionally show default section on load:
+    navigateTo('victim');
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crime Statistics Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+</head>
+
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-blue-950 to-cyan-blue text-white p-4 shadow-lg border-b border-blue-800">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <h1 class="text-2xl font-bold">Crime Statistics Dashboard</h1>
+      <a href="{{ url_for('dashboard.dashboard_home') }}"
+        class="text-white hover:text-blue-200 transition flex items-center gap-1">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Dashboard
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto p-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <!-- Case Status Pie Chart -->
+      <div class="bg-gray-800 p-4 rounded-xl shadow-md border border-gray-700">
+        <h2 class="text-xl font-semibold mb-4 text-teal-300">Case Status Distribution</h2>
+        <canvas id="statusChart" style="max-height: 250px;"></canvas>
+      </div>
+
+      <!-- Investigator Load Bar Chart -->
+      <div class="bg-gray-800 p-4 rounded-xl shadow-md border border-gray-700">
+        <h2 class="text-xl font-semibold mb-4 text-teal-300">Investigator Case Load</h2>
+        <canvas id="investigatorChart" style="max-height: 250px;"></canvas>
+      </div>
+    </div>
+
+    <!-- Crime Trends Line Chart -->
+    <div class="bg-gray-800 p-4 rounded-xl shadow-md border border-gray-700 mb-6">
+      <h2 class="text-xl font-semibold mb-4 text-teal-300">Crime Trends (Last 12 Months)</h2>
+      <canvas id="trendChart" style="max-height: 250px;"></canvas>
+    </div>
+
+    <!-- Case Outcomes Stacked Bar Chart -->
+    <div class="bg-gray-800 p-4 rounded-xl shadow-md border border-gray-700">
+      <h2 class="text-xl font-semibold mb-4 text-teal-300">Case Outcomes by Investigator</h2>
+      <canvas id="outcomeChart" style="max-height: 250px;"></canvas>
+    </div>
+  </main>
+
+  <script>
+    const chartColors = {
+      opened: '#FF6384',
+      'in progress': '#36A2EB',
+      closed: '#4BC0C0',
+      archived: '#9966FF',
+      unknown: '#FFCE56'
+    };
+
+    async function fetchData() {
+      try {
+        const [statusRes, investigatorRes, trendsRes, outcomesRes] = await Promise.all([
+          fetch('/stats/api/case-status'),
+          fetch('/stats/api/investigator-load'),
+          fetch('/stats/api/crime-trends'),
+          fetch('/stats/api/case-outcomes')
+        ]);
+
+        return {
+          statusData: await statusRes.json(),
+          investigatorData: await investigatorRes.json(),
+          trendsData: await trendsRes.json(),
+          outcomesData: await outcomesRes.json()
+        };
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        return null;
+      }
+    }
+
+    async function initializeCharts() {
+      const data = await fetchData();
+      if (!data) return;
+
+      // Case Status Chart
+      new Chart(document.getElementById('statusChart').getContext('2d'), {
+        type: 'pie',
+        data: {
+          labels: data.statusData.map(item => item._id),
+          datasets: [{
+            data: data.statusData.map(item => item.count),
+            backgroundColor: data.statusData.map(item => getStatusColor(item._id))
+          }]
+        },
+        options: getChartOptions('Distribution of Case Statuses')
+      });
+
+      // Investigator Load
+      new Chart(document.getElementById('investigatorChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: data.investigatorData.map(item => item.name),
+          datasets: [{
+            label: 'Case Count',
+            data: data.investigatorData.map(item => item.case_count),
+            backgroundColor: chartColors['in progress']
+          }]
+        },
+        options: getChartOptions('Cases per Investigator', false)
+      });
+
+      // Trends
+      new Chart(document.getElementById('trendChart').getContext('2d'), {
+        type: 'line',
+        data: {
+          labels: data.trendsData.map(item => item.date),
+          datasets: [{
+            label: 'Cases Reported',
+            data: data.trendsData.map(item => item.count),
+            borderColor: chartColors.opened,
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            fill: true,
+            tension: 0.2
+          }]
+        },
+        options: getChartOptions('Monthly Case Trends')
+      });
+
+      // Case Outcomes
+      const outcomeLabels = data.outcomesData.map(item => item.investigator);
+      const outcomeStatuses = [...new Set(data.outcomesData.flatMap(item => item.outcomes.map(o => o.status)))];
+
+      new Chart(document.getElementById('outcomeChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: outcomeLabels,
+          datasets: outcomeStatuses.map(status => ({
+            label: status,
+            data: data.outcomesData.map(investigator => {
+              const outcome = investigator.outcomes.find(o => o.status === status);
+              return outcome ? outcome.count : 0;
+            }),
+            backgroundColor: getStatusColor(status)
+          }))
+        },
+        options: {
+          ...getChartOptions('Case Outcomes by Investigator'),
+          scales: {
+            x: { stacked: true },
+            y: { stacked: true }
+          }
+        }
+      });
+    }
+
+    function getStatusColor(status) {
+      const key = status?.toLowerCase?.();
+      return chartColors[key] || chartColors.unknown;
+    }
+
+    function getChartOptions(title, showLegend = true) {
+      return {
+        responsive: true,
+        plugins: {
+          legend: {
+            display: showLegend,
+            position: 'right',
+            labels: { color: '#E5E7EB' }
+          },
+          title: {
+            display: true,
+            text: title,
+            color: '#E5E7EB',
+            font: { size: 16 }
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                const label = context.dataset.label || '';
+                const value = context.raw || 0;
+                const total = context.chart.data.datasets
+                  .map(d => d.data[context.dataIndex])
+                  .reduce((a, b) => a + b, 0);
+                const percentage = Math.round((value / total) * 100);
+                return `${label}: ${value} (${percentage}%)`;
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { color: '#E5E7EB' },
+            grid: { color: 'rgba(255,255,255,0.1)' }
+          },
+          x: {
+            ticks: { color: '#E5E7EB' },
+            grid: { color: 'rgba(255,255,255,0.1)' }
+          }
+        }
+      };
+    }
+
+    document.addEventListener('DOMContentLoaded', initializeCharts);
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cyber Laws</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+</head>
+
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white min-h-screen font-sans">
+  <header
+    class="bg-gradient-to-r from-blue-950 to-blue-900 p-4 flex justify-between items-center shadow-xl border-b border-blue-800">
+    <h1 class="text-2xl font-bold flex items-center gap-2">
+      Cyber Laws
+    </h1>
+    <a href="{{ url_for('dashboard.dashboard_home') }}"
+      class="text-white hover:text-blue-200 transition flex items-center gap-1">
+      <span class="material-symbols-outlined">arrow_back</span>
+      Dashboard
+    </a>
+  </header>
+
+  <main class="p-6 max-w-7xl mx-auto">
+    <section class="mb-6">
+      <h2 class="text-xl font-semibold flex items-center gap-2 mb-4 text-cyan-300">
+        <span class="material-symbols-outlined text-cyan-300">gavel</span>
+        Cybersecurity Laws Applicable to Phishing & Cybercrime
+      </h2>
+
+      <div class="overflow-x-auto bg-gray-800 p-6 rounded-xl shadow-md border border-gray-700">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-700 text-left">
+            <tr>
+              <th class="p-3">Section</th>
+              <th class="p-3">Description</th>
+              <th class="p-3">Penalty</th>
+            </tr>
+          </thead>
+          <tbody id="lawsTable">
+            {% for law in laws %}
+            <tr class="border-b border-gray-700 hover:bg-gray-700/30 transition">
+              <td class="p-3">{{ law.Section }}</td>
+              <td class="p-3">{{ law.Description }}</td>
+              <td class="p-3">{{ law.Penalty }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</body>
+
+</html>

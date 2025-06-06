@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Case</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+</head>
+
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white min-h-screen font-sans">
+    <header
+        class="bg-gradient-to-r from-blue-950 to-blue-900 p-4 flex justify-between items-center shadow-xl border-b border-blue-800">
+        <h1 class="text-2xl font-bold flex items-center gap-2">
+            <span class="material-symbols-outlined">edit</span>
+            Edit Case
+        </h1>
+        <a href="{{ url_for('cases.list_cases') }}"
+            class="text-white hover:text-blue-200 transition flex items-center gap-1">
+            <span class="material-symbols-outlined">arrow_back</span>
+            Back to Cases
+        </a>
+    </header>
+
+    <main class="p-6 max-w-4xl mx-auto">
+        <section class="bg-gray-800 p-6 rounded-xl shadow-md border border-gray-700">
+            <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined">edit_note</span> Update Case Details
+            </h2>
+
+            <form method="POST" action="{{ url_for('cases.edit_case', case_id=case._id) }}">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <!-- Case Number (read-only) -->
+                    <input type="text" name="case_number" value="{{ case.case_number }}" disabled
+                        class="bg-gray-600 p-3 rounded-lg border border-gray-500 text-gray-300 cursor-not-allowed" />
+                    <input type="text" name="case_title" value="{{ case.case_title }}"
+                        class="bg-gray-700 p-3 rounded-lg border border-gray-600" />
+
+                    <!-- Status Dropdown -->
+                    <select name="status" required class="bg-gray-700 p-3 rounded-lg border border-gray-600 text-white">
+                        <option value="Opened" {% if case.status=='Opened' %}selected{% endif %}>Opened</option>
+                        <option value="In Progress" {% if case.status=='In Progress' %}selected{% endif %}>In Progress
+                        </option>
+                        <option value="Closed" {% if case.status=='Closed' %}selected{% endif %}>Closed</option>
+                        <option value="Archived" {% if case.status=='Archived' %}selected{% endif %}>Archived</option>
+                    </select>
+
+                    <!-- Officer -->
+                    <select name="assignedOfficer" required class="bg-gray-700 p-3 rounded-lg border border-gray-600">
+                        <option value="">Select Officer</option>
+                        {% for officer in officers %}
+                        <option value="{{ officer._id }}" {% if officer._id==case.officer_id %}selected{% endif %}>
+                            {{ officer.off_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <textarea name="description" placeholder="Description"
+                    class="w-full bg-gray-700 p-3 rounded-lg border border-gray-600 mb-4">{{ case.description }}</textarea>
+
+                <h3 class="text-lg font-semibold mb-2 flex items-center gap-2">
+                    <span class="material-symbols-outlined">person</span> Victim Info
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <input type="text" name="vic_name" placeholder="Name"
+                        value="{{ case.victim['name'] if case.victim else '' }}"
+                        class="bg-gray-700 p-3 rounded-lg border border-gray-600" />
+                    <input type="text" name="vic_contact" placeholder="Contact"
+                        value="{{ case.victim['contact'] if case.victim else '' }}"
+                        class="bg-gray-700 p-3 rounded-lg border border-gray-600" />
+                    <input type="text" name="vic_address" placeholder="Address"
+                        value="{{ case.victim['address'] if case.victim else '' }}"
+                        class="bg-gray-700 p-3 rounded-lg border border-gray-600 col-span-full" />
+                </div>
+
+                <h3 class="text-lg font-semibold mb-2 flex items-center gap-2">
+                    <span class="material-symbols-outlined">warning</span> Suspect Info
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <input type="text" name="sus_name" placeholder="Name"
+                        value="{{ case.suspect[0]['name'] if case.suspect else '' }}"
+                        class="bg-gray-700 p-3 rounded-lg border border-gray-600" />
+                    <input type="text" name="sus_contact" placeholder="Contact"
+                        value="{{ case.suspect[0]['contact'] if case.suspect else '' }}"
+                        class="bg-gray-700 p-3 rounded-lg border border-gray-600" />
+                    <input type="email" name="sus_email" placeholder="Email"
+                        value="{{ case.suspect[0]['email'] if case.suspect else '' }}"
+                        class="bg-gray-700 p-3 rounded-lg border border-gray-600" />
+                    <input type="text" name="sus_status" placeholder="Status"
+                        value="{{ case.suspect[0]['status'] if case.suspect else '' }}"
+                        class="bg-gray-700 p-3 rounded-lg border border-gray-600" />
+                    <input type="text" name="sus_address" placeholder="Address"
+                        value="{{ case.suspect[0]['address'] if case.suspect else '' }}"
+                        class="bg-gray-700 p-3 rounded-lg border border-gray-600 col-span-full" />
+                </div>
+
+                <div class="mt-6 flex gap-4">
+                    <button type="submit"
+                        class="bg-yellow-500 hover:bg-yellow-400 px-5 py-2 rounded-lg transition flex items-center gap-2 text-black font-semibold">
+                        <span class="material-symbols-outlined">save</span> Save Changes
+                    </button>
+                    <a href="{{ url_for('cases.list_cases') }}"
+                        class="bg-red-600 hover:bg-red-500 px-5 py-2 rounded-lg transition flex items-center gap-2">
+                        <span class="material-symbols-outlined">cancel</span> Cancel
+                    </a>
+                </div>
+            </form>
+        </section>
+    </main>
+</body>
+
+</html>
